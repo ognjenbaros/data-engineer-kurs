@@ -23,4 +23,4 @@ $ git commit -a -m "Druga verzija domaceg 1.1"
 [main aaf5d7f] Druga verzija domaceg 1.1
  1 file changed, 4 insertions(+), 1 deletion(-)
 
- 
+jos nesto
