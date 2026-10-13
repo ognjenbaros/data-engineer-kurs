@@ -16,3 +16,6 @@ $ git commit -m "Prva verzija domaceg zadatka 1.1"
  $ git status
 On branch main
 nothing to commit, working tree clean
+
+
+ne svidja mi se ovaj poslednji deo, ali eto neka ostane tu
