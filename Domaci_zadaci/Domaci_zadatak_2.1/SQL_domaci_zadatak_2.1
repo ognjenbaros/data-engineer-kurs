@@ -21,4 +21,17 @@ FROM bootcamp.default.matches_flat
 WHERE home_team = 'Riverton Athletic'
 ORDER BY referee_id;
 
-/* Odgovor: Domaće utakmice kluba Riverton Athletic sudilo je 15 različitih sudija.
+/* Odgovor: Domaće utakmice kluba Riverton Athletic sudilo je 15 različitih sudija. */
+
+
+
+--Zadatak 3)
+
+SELECT match_id, home_team, away_team,
+    (home_goals_ht - away_goals_ht) AS half_time_goal_diff,
+    (home_goals - away_goals) AS final_goal_diff
+FROM bootcamp.default.matches_flat
+WHERE (away_goals_ht > home_goals_ht) AND (home_goals > away_goals);
+
+/* Odgovor: U 15 mečeva je na poluvremenu vodio gost, a na kraju pobednik bio domaćin. */
+
