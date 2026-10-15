@@ -8,7 +8,7 @@ ORDER BY (stadium_capacity - attendance) DESC
 LIMIT 5;
 
 /*
- Odgovor: Zajednično prvim trima je domaći tim, i stadion na kom su igrali:
+ Odgovor: Zajedničko prvim trima je domaći tim i stadion na kom su igrali:
         Oakfield Town i National Stadium
 */
 
@@ -51,4 +51,16 @@ LIMIT 1;
  drugim poluvremenom što se golova tiče u poslednjih par sezona,
  sa skromnih 1-0 na poluvremenu i fantastičnih 6-3 na kraju utakmice */
 
- 
+
+
+--Zadatak 5)
+
+SELECT match_id, home_team, away_team
+FROM bootcamp.default.matches_flat
+WHERE season = '2023/24' AND (weather = 'fog' OR weather = 'snow')
+ORDER BY kickoff_ts;
+
+/* Odgovor: U sezoni 2023/24 bilo je 25 utakmica odigranih u uslovima snega i magle. */
+
+
+
