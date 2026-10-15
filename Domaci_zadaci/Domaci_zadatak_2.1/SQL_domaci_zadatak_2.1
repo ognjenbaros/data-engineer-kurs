@@ -1,0 +1,10 @@
+SELECT match_id, home_team, away_team, stadium_name,
+    (stadium_capacity - attendance) AS empty_seats
+FROM bootcamp.default.matches_flat
+ORDER BY (stadium_capacity - attendance) DESC
+LIMIT 5;
+
+/*
+ Odgovor: Zajednično prvim trima je domaći tim, i stadion na kom su igrali:
+        Oakfield Town i National Stadium
+*/
