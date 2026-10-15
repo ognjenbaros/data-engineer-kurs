@@ -1,3 +1,6 @@
+
+--Prvi zadatak)
+
 SELECT match_id, home_team, away_team, stadium_name,
     (stadium_capacity - attendance) AS empty_seats
 FROM bootcamp.default.matches_flat
@@ -8,3 +11,14 @@ LIMIT 5;
  Odgovor: Zajednično prvim trima je domaći tim, i stadion na kom su igrali:
         Oakfield Town i National Stadium
 */
+
+
+
+--Zadatak 2)
+
+SELECT DISTINCT referee_id, referee_name
+FROM bootcamp.default.matches_flat
+WHERE home_team = 'Riverton Athletic'
+ORDER BY referee_id;
+
+/* Odgovor: Domaće utakmice kluba Riverton Athletic sudilo je 15 različitih sudija.
