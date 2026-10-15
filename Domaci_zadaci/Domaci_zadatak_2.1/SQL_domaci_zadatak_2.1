@@ -35,3 +35,16 @@ WHERE (away_goals_ht > home_goals_ht) AND (home_goals > away_goals);
 
 /* Odgovor: U 15 mečeva je na poluvremenu vodio gost, a na kraju pobednik bio domaćin. */
 
+
+
+--Zadatak 4)
+
+SELECT home_team, away_team, 
+ home_goals_ht, away_goals_ht,
+ home_goals, away_goals,
+ (home_goals_ht + away_goals_ht) AS HT_goals
+FROM bootcamp.default.matches_flat
+ORDER BY ((home_goals + away_goals) - (home_goals_ht + away_goals_ht)) DESC, (home_goals + away_goals) DESC
+LIMIT 1;
+
+/* Odgovor: Utakmica Northport United - Newbury Forest je bila najzanimljivija u drugom poluvremeno što se golova tiče, sa rezultatom 1-0 na poluvremenu i fantastičnih 6-3 na kraju. */
