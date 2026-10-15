@@ -1,5 +1,5 @@
 
---Prvi zadatak)
+--Zadatak 1)
 
 SELECT match_id, home_team, away_team, stadium_name,
     (stadium_capacity - attendance) AS empty_seats
@@ -47,4 +47,8 @@ FROM bootcamp.default.matches_flat
 ORDER BY ((home_goals + away_goals) - (home_goals_ht + away_goals_ht)) DESC, (home_goals + away_goals) DESC
 LIMIT 1;
 
-/* Odgovor: Utakmica Northport United - Newbury Forest je bila najzanimljivija u drugom poluvremeno što se golova tiče, sa rezultatom 1-0 na poluvremenu i fantastičnih 6-3 na kraju. */
+/* Odgovor: Utakmica Northport United - Newbury Forest je bila utakmica sa najzanimljivijim
+ drugim poluvremenom što se golova tiče u poslednjih par sezona,
+ sa skromnih 1-0 na poluvremenu i fantastičnih 6-3 na kraju utakmice */
+
+ 
