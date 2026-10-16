@@ -79,6 +79,7 @@ da odgovorim ko je pobednik svakog meča je da u posebnoj koloni prikažem
 gol razliku na tim mečevima. */
 
 
+
 --Zadatak 7)
 
 SELECT match_id, home_team, away_team, kickoff_ts
@@ -90,4 +91,17 @@ LIMIT 3;
 /* Odgovor: S obzirom na to da u sezoni 2024/25 imamo više utakmica 
 koje su počinjale u isto vreme,ideja je da je match_id jedini
 parametar po kom možemo pretpostaviti koji meč je počeo prvi. */
+
+
+
+--Zadatak 8)
+
+SELECT match_id, home_team, away_team, first_goal_scorer
+FROM bootcamp.default.matches_flat
+WHERE first_goal_scorer = "Sean O'Neill"
+ORDER BY season;
+
+/* Odgovor: Sean O'Neill, igrač Fairhaven Town, je dva puta bio strelac prvog gola,
+u mečevima protv Elmsworth Wanderers i Dunmore County.
+
 
