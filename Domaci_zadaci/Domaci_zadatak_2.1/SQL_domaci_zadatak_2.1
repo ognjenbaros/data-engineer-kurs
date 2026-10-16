@@ -64,3 +64,17 @@ ORDER BY kickoff_ts;
 
 
 
+--Zadatak 6)
+
+SELECT match_id, home_team, away_team, season,
+    (home_goals - away_goals) AS goal_diff
+FROM bootcamp.default.matches_flat
+WHERE (home_team = 'Northport United' OR away_team = 'Northport United')
+    AND (home_team = 'Northport City' OR away_team = 'Northport City')
+ORDER BY kickoff_ts;
+
+/* Odgovor: Northport United i Northport City su odigrali četiri meča,
+po dva u sezonama 2023/24 i 2024/25. Jedini način koji mi je pao na pamet
+da odgovorim ko je pobednik svakog meča je da u posebnoj koloni prikažem
+gol razliku na tim mečevima. */
+
