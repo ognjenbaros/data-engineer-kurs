@@ -78,3 +78,16 @@ po dva u sezonama 2023/24 i 2024/25. Jedini način koji mi je pao na pamet
 da odgovorim ko je pobednik svakog meča je da u posebnoj koloni prikažem
 gol razliku na tim mečevima. */
 
+
+--Zadatak 7)
+
+SELECT match_id, home_team, away_team, kickoff_ts
+FROM bootcamp.default.matches_flat
+WHERE season = '2024/25'
+ORDER BY kickoff_ts, match_id
+LIMIT 3;
+
+/* Odgovor: S obzirom na to da u sezoni 2024/25 imamo više utakmica 
+koje su počinjale u isto vreme,ideja je da je match_id jedini
+parametar po kom možemo pretpostaviti koji meč je počeo prvi. */
+
