@@ -1,0 +1,36 @@
+-- DODATNI DOMACI
+
+
+--1)
+
+SELECT DISTINCT match_id, referee_name, attendance
+FROM bootcamp.default.matches_flat
+WHERE (referee_name IS NULL) AND (attendance IS NULL)
+ORDER BY match_id;
+
+/* Ja ne pronalazim utakmice koje nemaju podatak o sudiji, samim tim će ova pretraga biti prazna,
+     jer moraju da se ispune oba uslova */
+
+
+
+--2)
+
+SELECT match_id,
+    home_team, away_team
+FROM bootcamp.default.matches_flat
+WHERE kickoff_ts >= '2025-03-01' AND kickoff_ts <= '2025-03-31'
+ORDER BY DATE(kickoff_ts);
+
+-- Odgovor: 40 utakmica odigranih između 1. marta i 31. marta 2025.
+
+
+
+--3)
+
+SELECT match_id,
+    home_team, away_team
+FROM bootcamp.default.matches_flat
+WHERE kickoff_ts >= '2024-12-19' AND kickoff_ts < '2025-01-11'
+ORDER BY DATE(kickoff_ts);
+
+-- Odgovor: U periodu od 20.12.2024. do 10.01.2025. odigrana je 51 utakmica.
