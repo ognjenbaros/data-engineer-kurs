@@ -7,6 +7,10 @@ FROM bootcamp.default.matches_flat
 WHERE match_report ILIKE '%goal%'
 ORDER BY match_id;
 
+/* Odgovor: Reč 'goal' se pojavljuje samo u formi 'goalless stalemate'
+        Takvih utakmica je bilo 41.
+*/
+
 
 
 --Zadatak 2
@@ -15,6 +19,8 @@ SELECT coalesce(referee_name, 'Unknown') AS referee_name,
     home_team_code, away_team_code
 FROM bootcamp.default.matches_flat
 LIMIT 20;
+
+-- Odgovor: U našoj bazi nema vrsta u kojoj nedostaje podatak o sudiji na meču.
 
 
 
@@ -26,7 +32,9 @@ FROM bootcamp.default.matches_flat
 WHERE LENGTH(match_report) > '40'
 ORDER BY LENGTH(match_report);
 
---Odgovor: match report duži od 40 znakova podrazumeva da ima 41 znak ili više
+/* Odgovor: Match_report duži od 40 znakova podrazumeva da ima 41 znak ili više,
+        tako da imamo 537 mečeva gde je match_report bio duži od 40 karaktera.
+*/
 
 
 
@@ -38,6 +46,8 @@ SELECT match_id,
 FROM bootcamp.default.matches_flat
 WHERE kickoff_ts >= '2025-01-01' AND  kickoff_ts < '2025-01-16'
 ORDER BY kickoff_ts;
+
+-- Odgovor: Imamo 31 utakmicu odigranu između 1. i 15. januara.
 
 
 
@@ -70,6 +80,10 @@ FROM bootcamp.default.matches_flat
 WHERE season = '2024/25' AND (attendance BETWEEN '20000' AND '35000')
 ORDER BY attendance DESC;
 
+/* Odgovor: U sezoni 2024/25 bilo je 188 utakmica
+            sa posetom između 20.000 i 35.000 gledalaca.
+*/
+
 
 
 --Zadatak 7
@@ -78,6 +92,8 @@ SELECT DISTINCT first_goal_scorer
 FROM bootcamp.default.matches_flat
 WHERE (first_goal_scorer LIKE "A%") OR (first_goal_scorer LIKE "%-%")
 ORDER BY first_goal_scorer;
+
+-- Odgovor: Imamo 22 igrača čije ime počinje na A ili u imenu ima crticu.
 
 
 
@@ -89,11 +105,18 @@ FROM bootcamp.default.matches_flat
 WHERE season = '2024/25' AND TIME(kickoff_ts) BETWEEN '18:00' AND '21:00'
 ORDER BY TIME(kickoff_ts);
 
+-- Odgovor: U sezoni 2024/25 bilo je 12 mečeva sa početkom između 18 i 21 čas.
+
 
 
 --Zadatak 9
 
 SELECT match_id, match_report, kickoff_ts
 FROM bootcamp.default.matches_flat
-WHERE (YEAR(kickoff_ts) = '2025') AND (MONTH(kickoff_ts) IN ('3','4','5')) AND (match_report ILIKE '%win%')
+WHERE (YEAR(kickoff_ts) = '2025') AND (MONTH(kickoff_ts) IN ('3','4','5')) AND (match_report ILIKE '%win %')
 ORDER BY match_id;
+
+-- Odgovor: U martu, aprilu i maju 2025. godine odigrano je 3 mečeva čiji match_report sadrži reč 'win'
+
+-- napomena: U martu i aprilu imamo utakmice u čujem izveštaju stoji 'winner', ali mislim da to ne ispunjava naš upit
+--           U maju 2025. nije bilo nijedne utakmice u čujem izveštaju je pisala reč 'win'
