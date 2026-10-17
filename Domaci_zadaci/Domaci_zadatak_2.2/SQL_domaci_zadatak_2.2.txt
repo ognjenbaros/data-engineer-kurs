@@ -1,0 +1,99 @@
+Domaći zadatak 2.2
+
+-- Zadatak 1
+
+SELECT match_id, home_team_code, away_team_code,match_report
+FROM bootcamp.default.matches_flat
+WHERE match_report ILIKE '%goal%'
+ORDER BY match_id;
+
+
+
+--Zadatak 2
+
+SELECT coalesce(referee_name, 'Unknown') AS referee_name,
+    home_team_code, away_team_code
+FROM bootcamp.default.matches_flat
+LIMIT 20;
+
+
+
+--Zadatak 3
+
+SELECT match_id, match_report,
+    LENGTH(match_report) AS match_report_length
+FROM bootcamp.default.matches_flat
+WHERE LENGTH(match_report) > '40'
+ORDER BY LENGTH(match_report);
+
+--Odgovor: match report duži od 40 znakova podrazumeva da ima 41 znak ili više
+
+
+
+--Zadatak 4
+
+SELECT match_id,
+        home_team_code, away_team_code,
+        kickoff_ts
+FROM bootcamp.default.matches_flat
+WHERE kickoff_ts >= '2025-01-01' AND  kickoff_ts < '2025-01-16'
+ORDER BY kickoff_ts;
+
+
+
+--Zadatak 5
+
+SELECT match_id,
+        home_team_code, away_team_code,
+        DATE(kickoff_ts) AS match_date,
+        dayofweek(kickoff_ts) AS day_of_week
+FROM bootcamp.default.matches_flat
+WHERE dayofweek(kickoff_ts) = '6'
+ORDER BY match_id;
+
+/*nedelja, ponedeljak, utorak, sreda, cetvrtak, petak, subota
+     1          2        3       4        5       6       7
+ 
+   Odgovor: S obzirom na to da daysofweek() vraća broj 1 za nedelju,
+            petak je predstavljen šesticom. 
+            Nijedna utakmica iz naše baze nije odigrana u petak.
+*/
+
+
+
+--Zadatak 6
+
+SELECT match_id,
+        home_team_code, away_team_code,
+        attendance
+FROM bootcamp.default.matches_flat
+WHERE season = '2024/25' AND (attendance BETWEEN '20000' AND '35000')
+ORDER BY attendance DESC;
+
+
+
+--Zadatak 7
+
+SELECT DISTINCT first_goal_scorer
+FROM bootcamp.default.matches_flat
+WHERE (first_goal_scorer LIKE "A%") OR (first_goal_scorer LIKE "%-%")
+ORDER BY first_goal_scorer;
+
+
+
+--Zadatak 8
+
+SELECT match_id, home_team, away_team,
+    TIME(kickoff_ts) AS game_start
+FROM bootcamp.default.matches_flat
+WHERE season = '2024/25' AND TIME(kickoff_ts) BETWEEN '18:00' AND '21:00'
+ORDER BY TIME(kickoff_ts);
+
+
+
+--Zadatak 9
+
+SELECT match_id, match_report, kickoff_ts
+FROM bootcamp.default.matches_flat
+WHERE (YEAR(kickoff_ts) = '2025') AND (MONTH(kickoff_ts) IN ('3','4','5')) AND (match_report ILIKE '%win%')
+ORDER BY match_id;
