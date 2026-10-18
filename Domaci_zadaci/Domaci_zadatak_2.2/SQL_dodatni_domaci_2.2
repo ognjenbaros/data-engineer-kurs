@@ -34,3 +34,70 @@ WHERE kickoff_ts >= '2024-12-19' AND kickoff_ts < '2025-01-11'
 ORDER BY DATE(kickoff_ts);
 
 -- Odgovor: U periodu od 20.12.2024. do 10.01.2025. odigrana je 51 utakmica.
+
+
+
+--4)
+
+SELECT match_id, 
+        DATE(kickoff_ts) AS match_date,
+        home_team, away_team,
+        coalesce(cast(attendance as string), 'Unknown') AS attendance_status
+FROM bootcamp.default.matches_flat
+ORDER BY kickoff_ts;
+
+
+
+
+--5)
+
+SELECT match_id,
+        home_team_code, away_team_code,
+        (home_goals + away_goals) AS total_goals,
+        DATE(kickoff_ts) AS date
+FROM bootcamp.default.matches_flat
+WHERE (kickoff_ts >= '2025-04-01') AND (kickoff_ts < '2025-05-01')
+    AND ((home_goals + away_goals) BETWEEN 2 AND 4)
+ORDER BY DATE(kickoff_ts);
+
+-- Odgovor: 22 utakmice odigrane između 1. i 30. aprila 2025. 
+--          sa dva do četiri gola postignuta na kraju meča.
+
+
+
+--6)
+
+SELECT match_id,
+        home_team_code, away_team_code,
+        (home_goals + away_goals) AS total_goals,
+        DATE(kickoff_ts) AS date
+FROM bootcamp.default.matches_flat
+WHERE (kickoff_ts >= '2025-04-01') AND (kickoff_ts < '2025-05-01')
+    AND ((home_goals + away_goals) BETWEEN 2 AND 4)
+ORDER BY DATE(kickoff_ts);
+
+-- Odgovor: 22 utakmice odigrane između 1. i 30. aprila 2025. 
+--          sa dva do četiri gola postignuta na kraju meča.
+
+
+
+--6)
+
+SELECT match_id,
+        DATE(kickoff_ts) AS match_date,
+       CONCAT(home_team_code, ' ', cast(home_goals_ht as string),
+        ' - ',
+        cast(away_goals_ht as string), ' ', away_team_code) AS score_ht,
+       CONCAT(home_team_code, ' ', cast(home_goals as string),
+        ' - ',
+        cast(away_goals as string), ' ', away_team_code) AS end_score
+FROM bootcamp.default.matches_flat
+--WHERE (home_goals_ht = away_goals_ht) AND (home_goals <> away_goals)
+WHERE (home_goals_ht = away_goals_ht) AND ((home_goals <> home_goals_ht) OR (away_goals <> away_goals_ht))
+ORDER BY kickoff_ts;
+
+
+-- Odgovor: Prikazujemo utakmice u kojima je rezultat na poluvremenu bio nerešen, 
+--          a u drugom poluvremenu je došlo do promene rezultata.
+--napomena: Uključili smo utakmice koje su na poluvremenu imale jedan nerešen rezultat,
+--          a na kraju drugačiji nerešen rezultat.
