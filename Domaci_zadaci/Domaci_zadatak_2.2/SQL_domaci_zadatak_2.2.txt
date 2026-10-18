@@ -116,7 +116,8 @@ FROM bootcamp.default.matches_flat
 WHERE (YEAR(kickoff_ts) = '2025') AND (MONTH(kickoff_ts) IN ('3','4','5')) AND (match_report ILIKE '%win %')
 ORDER BY match_id;
 
--- Odgovor: U martu, aprilu i maju 2025. godine odigrano je 3 mečeva čiji match_report sadrži reč 'win'
+-- Odgovor: U martu, aprilu i maju 2025. godine odigrano je 3 meča čiji match_report sadrži reč 'win'
 
--- napomena: U martu i aprilu imamo utakmice u čujem izveštaju stoji 'winner', ali mislim da to ne ispunjava naš upit
+-- napomena: U martu i aprilu imamo dve utakmice u čujem izveštaju stoji 'winner',
+--           ali mislim da to baš i i ne ispunjava naš upit
 --           U maju 2025. nije bilo nijedne utakmice u čujem izveštaju je pisala reč 'win'
