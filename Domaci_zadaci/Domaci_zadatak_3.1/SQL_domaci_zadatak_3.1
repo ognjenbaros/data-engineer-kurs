@@ -1,0 +1,91 @@
+--Zadatak 1
+
+SELECT season,
+        COUNT(home_goals) AS season_matches,
+        SUM(home_goals + away_goals) AS total_goals,
+        ROUND(AVG(home_goals+away_goals),2) AS goals_per_match
+FROM bootcamp.default.matches_flat
+GROUP BY season;
+
+--Odgovor: stavili smo COUNT(home_goals) jer time preskacemo odlozenu utakmicu
+
+
+
+--Zadatak 2
+
+SELECT stadium_name,
+        MAX(attendance) AS max_visit,
+        MIN(attendance) AS min_visit,
+        FLOOR(AVG(attendance)) AS avg_visit,
+        COUNT(attendance) AS known_visits
+FROM bootcamp.default.matches_flat
+GROUP BY stadium_name
+ORDER BY avg_visit DESC;
+
+
+
+--Zadatak 3)
+
+SELECT referee_name,
+        COUNT(*) AS matches_refereed,
+        SUM(home_yellow_cards + away_yellow_cards) AS total_yellow_cards
+FROM bootcamp.default.matches_flat
+GROUP BY referee_name
+HAVING total_yellow_cards >= 20 AND matches_refereed >= 10
+ORDER BY total_yellow_cards DESC;
+
+
+
+--Zadatak 4)
+
+SELECT  
+    CASE WHEN (home_goals + away_goals) >= 3 THEN 'Mnogo golova'
+         WHEN (home_goals + away_goals) > 0 THEN 'Malo golova'
+         ELSE 'Bez golova' END AS total_goals_info,
+         COUNT(*) AS matches_in_category,
+         MAX(home_goals + away_goals) AS max_goals_in_category
+FROM bootcamp.default.matches_flat
+GROUP BY total_goals_info;
+
+
+
+--Zadatak 5)
+
+SELECT home_team,
+        COUNT(home_goals) AS home_games,
+        SUM(CASE WHEN home_goals > away_goals THEN 1 ELSE 0 END) AS wins,
+        SUM(CASE WHEN away_goals > home_goals THEN 1 ELSE 0 END) AS losses
+FROM bootcamp.default.matches_flat
+GROUP BY home_team
+HAVING home_games >= 10
+ORDER BY home_games DESC, wins DESC;
+
+--Odgovor: sa COUNT(home_goals) smo preskocili odlozenu utakmicu
+
+
+
+--6)
+
+SELECT referee_name,
+        COUNT(*) AS total_games_refereed,
+        SUM(CASE WHEN (home_red_cards + away_red_cards) > 0 THEN 1 ELSE 0 END) as shown_red_card,
+        ROUND(100 * shown_red_card / total_games_refereed, 2) AS percentage
+FROM bootcamp.default.matches_flat
+GROUP BY referee_name
+ORDER BY referee_name;
+
+
+
+--7)
+
+SELECT season,
+        SUM(CASE WHEN home_goals > away_goals THEN 1 ELSE 0 END) AS home_wins,
+        SUM(CASE WHEN away_goals > home_goals THEN 1 ELSE 0 END) AS away_wins,
+        SUM(CASE WHEN home_goals = away_goals THEN 1 ELSE 0 END) AS draws,
+        ROUND( 100 * draws / COUNT(home_goals), 2) AS draw_percentage
+FROM bootcamp.default.matches_flat
+GROUP BY season
+ORDER BY season, home_wins;
+
+
+-- sa COUNT(home_goals) smo preskocili odlozenu utakmicu
