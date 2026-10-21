@@ -18,8 +18,7 @@ SELECT DISTINCT CONCAT( p.first_name, ' ', p.last_name) AS player_name,
 FROM players AS p
 JOIN player_contracts AS pc ON p.player_id = pc.player_id
 JOIN teams AS t ON pc.team_id = t.team_id
-JOIN matches AS m ON m.home_team_id = t.team_id
-WHERE m.season = '2024/25'
+LEFT JOIN matches AS m ON m.home_team_id = t.team_id AND m.season = '2024/25'
 ORDER BY player_name;
 
 
