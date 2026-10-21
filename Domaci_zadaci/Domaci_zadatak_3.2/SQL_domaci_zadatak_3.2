@@ -1,0 +1,131 @@
+----OSNOVNI NIVO----
+
+
+-- 1.Prikažite naziv svakog kluba i naziv stadiona na kojem igra
+-- domaće utakmice.
+
+SELECT t.team_name, s.stadium_name
+FROM teams AS t
+JOIN stadiums AS s ON t.stadium_id = s.stadium_id;
+
+
+
+-- 2.Prikažite ime i prezime igrača i naziv kluba za koji je igrao u
+-- sezoni 2024/25. Uklonite duplikate iz rezultata.
+
+SELECT DISTINCT CONCAT( p.first_name, ' ', p.last_name) AS player_name,
+        t.team_name AS player_team
+FROM players AS p
+JOIN player_contracts AS pc ON p.player_id = pc.player_id
+JOIN teams AS t ON pc.team_id = t.team_id
+JOIN matches AS m ON m.home_team_id = t.team_id
+WHERE m.season = '2024/25'
+ORDER BY player_name;
+
+
+
+--3.Prikažite datum odigravanja utakmice, naziv stadiona i broj
+-- gledalaca za sve utakmice u sezoni 2024/25.
+
+SELECT DATE(m.kickoff_ts) AS match_date,
+        s.stadium_name,
+        m.attendance
+FROM matches AS m
+JOIN stadiums AS s ON m.stadium_id = s.stadium_id
+WHERE m.season = '2024/25'
+ORDER BY match_date;
+
+
+
+----SREDNJI NIVO----
+
+
+-- 1.Prikažite sve utakmice za koje nije evidentiran broj gledalaca.
+-- Prikažite datum, domaći klub i gostujući klub.
+
+SELECT  DATE(m.kickoff_ts) AS match_date,
+        ht.team_name,
+        at.team_name
+FROM matches AS m
+JOIN teams AS ht ON m.home_team_id = ht.team_id
+JOIN teams AS at ON m.away_team_id = at.team_id
+WHERE m.attendance IS NULL
+ORDER BY match_date;
+
+
+
+-- 2.Pronađite stadione na kojima nije odigrana ni jedna utakmica
+-- u sezoni 2024/25.
+
+SELECT s.stadium_id, s.stadium_name, COUNT(m.stadium_id) AS matches_played_on_stadium
+FROM stadiums AS s
+LEFT JOIN matches AS m ON m.stadium_id = s.stadium_id AND m.season = '2024/25'
+GROUP BY s.stadium_id, s.stadium_name
+HAVING matches_played_on_stadium = 0;
+
+
+
+-- 3.Za svaki klub izračunajte ukupan broj žutih kartona koje su
+-- dobili njegovi igrači u sezoni 2024/25. Rezultat sortirajte
+-- opadajuće prema broju kartona.
+
+SELECT t.team_name,
+        SUM(CASE WHEN me.event_type ILIKE '%yellow%' THEN 1 ELSE 0 END) AS all_yellow_cards
+FROM match_events AS me
+LEFT JOIN matches AS m ON m.match_id = me.event_id AND m.season = '2024/25'
+JOIN teams AS t ON me.team_id = t.team_id
+GROUP BY t.team_name
+ORDER BY all_yellow_cards DESC;
+
+
+
+----NAPREDNI NIVO----
+
+
+-- 1.Pronađite pet igrača sa najvećim brojem asistencija u
+-- sezoni 2024/25. Prikažite ime igrača i broj asistencija.
+
+SELECT CONCAT(p.first_name, ' ', p.last_name) AS player_name,
+        SUM(CASE WHEN me.event_type ILIKE '%goal%' THEN 1 ELSE 0 END) AS assists,
+        m.season
+FROM match_events AS me
+JOIN players AS p ON p.player_id = me.related_player_id
+JOIN matches AS m ON m.match_id = me.match_id AND m.season = '2024/25'
+GROUP BY player_name, m.season
+ORDER BY assists DESC, player_name
+LIMIT 5;
+
+
+
+-- 2.Pronađite tri igrača sa najvećim ukupnim brojem
+-- odigranih minuta u sezoni 2024/25. Prikažite ime igrača,
+-- klub i ukupan broj minuta.
+
+
+SELECT CONCAT(p.first_name, ' ', p.last_name) AS player_name,
+        SUM(pms.minutes_played) AS total_min_played,
+        t.team_name
+FROM player_match_stats AS pms
+JOIN matches AS m ON pms.match_id = m.match_id AND m.season = '2024/25'
+JOIN teams AS t ON pms.team_id = t.team_id
+JOIN players AS p ON pms.player_id = p.player_id
+GROUP BY player_name, t.team_name
+ORDER BY total_min_played DESC, player_name
+LIMIT 5;
+
+
+
+-- 3.Za svaku sezonu prikažite broj isključenja po klubovima.
+-- Računajte događaje red_card i second
+-- _yellow. Uključite samo klubove koji su imali najmanje jedno isključenje.
+
+
+SELECT m.season,
+        t.team_name,
+        SUM(CASE WHEN (me.event_type ILIKE '%red%' OR me.event_type ILIKE 'second%') THEN 1 ELSE 0 END) total_ejections
+FROM match_events AS me
+JOIN matches AS m ON m.match_id = me.match_id
+JOIN teams AS t ON me.team_id = t.team_id
+GROUP BY m.season, t.team_name
+HAVING total_ejections > 0
+ORDER BY m.season, t.team_name;
