@@ -7,7 +7,10 @@ SELECT season,
 FROM bootcamp.default.matches_flat
 GROUP BY season;
 
---Odgovor: stavili smo COUNT(home_goals) jer time preskacemo odlozenu utakmicu
+--Odgovor: Sezona 2024/25 je bila uspešnija sa 46 postignutih golova (1092 ukupno)
+--          i u proseku 2.87 golova po utakmici 
+
+--napomena: stavili smo COUNT(home_goals) jer time preskacemo odlozenu utakmicu
 
 
 
@@ -22,6 +25,9 @@ FROM bootcamp.default.matches_flat
 GROUP BY stadium_name
 ORDER BY avg_visit DESC;
 
+--Odgovor: Stadion Harbourside Park je zabeležio najveću posetu u sezoni (50922),
+--         kao i najveću prosečnu posetu po utakmici u sezonama 2023/24 i 2024/25 (44415)
+
 
 
 --Zadatak 3)
@@ -34,6 +40,7 @@ GROUP BY referee_name
 HAVING total_yellow_cards >= 20 AND matches_refereed >= 10
 ORDER BY total_yellow_cards DESC;
 
+--Odgovor: Listu predvodi sudija Henrik Dahl 164 žuta kartona na 40 suđenih utakmica.
 
 
 --Zadatak 4)
@@ -46,6 +53,11 @@ SELECT
          MAX(home_goals + away_goals) AS max_goals_in_category
 FROM bootcamp.default.matches_flat
 GROUP BY total_goals_info;
+
+--Odgovor: U sezonama 2023/24 i 2024/25 bilo je čak 389 utakmica
+--         sa postignuta 3 ili više gola (pri čemu je najveći broj pogodaka na utakmici bio 9).
+--         Malo golova (do 2 gola) je bilo na 330 utakmica,
+--         a bez golova su se završile 42 utakmice.
 
 
 
@@ -60,7 +72,8 @@ GROUP BY home_team
 HAVING home_games >= 10
 ORDER BY home_games DESC, wins DESC;
 
---Odgovor: sa COUNT(home_goals) smo preskocili odlozenu utakmicu
+--Odgovor: Nauspešniji tim u utakmicama kod kuće je bio Northport City sa 26 pobeda
+--      i samo 4 poraza u 38 utakmica.
 
 
 
@@ -72,7 +85,10 @@ SELECT referee_name,
         ROUND(100 * shown_red_card / total_games_refereed, 2) AS percentage
 FROM bootcamp.default.matches_flat
 GROUP BY referee_name
-ORDER BY referee_name;
+ORDER BY percentage DESC;
+
+--Odgovor: Prvo mesto po broju pokazanih crvenih kartona dele sudije
+--         Robert Kane i Craig Pawson-Lee sa po 8 isključenja, odnosno na 20% utakmica.
 
 
 
@@ -87,5 +103,6 @@ FROM bootcamp.default.matches_flat
 GROUP BY season
 ORDER BY season, home_wins;
 
-
--- sa COUNT(home_goals) smo preskocili odlozenu utakmicu
+--Odgovor: season	home_wins	away_wins	draws	draw_percentage
+--        2023/24 	  172	         112             96	      25.26
+--        2024/25	  157	         128	         95	       25
