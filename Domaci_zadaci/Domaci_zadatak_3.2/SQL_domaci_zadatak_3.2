@@ -21,6 +21,9 @@ JOIN teams AS t ON pc.team_id = t.team_id
 LEFT JOIN matches AS m ON m.home_team_id = t.team_id AND m.season = '2024/25'
 ORDER BY player_name;
 
+--Imamo duplikate kada je jedan igrač u toku sezone igrao za dva kluba
+-- usled transfera ili pozajmice
+
 
 
 --3.Prikažite datum odigravanja utakmice, naziv stadiona i broj
@@ -62,6 +65,8 @@ LEFT JOIN matches AS m ON m.stadium_id = s.stadium_id AND m.season = '2024/25'
 GROUP BY s.stadium_id, s.stadium_name
 HAVING matches_played_on_stadium = 0;
 
+--Stadion Fairhaven Lane
+
 
 
 -- 3.Za svaki klub izračunajte ukupan broj žutih kartona koje su
@@ -75,6 +80,8 @@ LEFT JOIN matches AS m ON m.match_id = me.event_id AND m.season = '2024/25'
 JOIN teams AS t ON me.team_id = t.team_id
 GROUP BY t.team_name
 ORDER BY all_yellow_cards DESC;
+
+--znam da nije tačan upit, jer mi vraća ukupan broj žutih kartona iz obe sezone
 
 
 
@@ -94,6 +101,9 @@ GROUP BY player_name, m.season
 ORDER BY assists DESC, player_name
 LIMIT 5;
 
+-- U sezoni 2024/25 su Pablo Fernández (9), Eirik Solberg (7),
+-- Filip Petrović (7), Lucas Pereira (7), Kieran Bradley (6)
+
 
 
 -- 2.Pronađite tri igrača sa najvećim ukupnim brojem
@@ -112,6 +122,9 @@ GROUP BY player_name, t.team_name
 ORDER BY total_min_played DESC, player_name
 LIMIT 5;
 
+ -- Četiri igrača dele prvo mesto sa odigranih celih 36 utakmica (3240 minuta):
+ --Aaron Lowe, Ibrahima Ndiaye, Jonas Müller, Morgan Nolan
+
 
 
 -- 3.Za svaku sezonu prikažite broj isključenja po klubovima.
@@ -127,4 +140,7 @@ JOIN matches AS m ON m.match_id = me.match_id
 JOIN teams AS t ON me.team_id = t.team_id
 GROUP BY m.season, t.team_name
 HAVING total_ejections > 0
-ORDER BY m.season, t.team_name;
+ORDER BY m.season, total_ejections DESC;
+
+--U sezoni 2023/24 Redcliffe Athletic je imao najviše isključenja, pet,
+--dok je u sezoni 2024/25 predvodio Riverton Athletic sa čak 7.
