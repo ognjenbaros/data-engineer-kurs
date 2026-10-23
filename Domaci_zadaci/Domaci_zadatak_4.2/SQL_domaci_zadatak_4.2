@@ -51,3 +51,50 @@ FROM club
 JOIN teams AS t ON club.team_id = t.team_id
 JOIN games_home AS gh ON t.team_id = gh.team_id
 GROUP BY t.team_name, wins, draws, losses, home_points, home_goals_for, home_goals_against;
+
+
+
+---------------------------------------------------------------------------------------
+
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
+    games_home AS (SELECT home_team_id AS team_id,
+                            COUNT_IF(home_goals > away_goals) AS team_wins,
+                            COUNT_IF(home_goals = away_goals) AS team_draws,
+                            COUNT_IF(home_goals < away_goals) AS team_losses,
+                            SUM(home_goals) AS goals_for,
+                            SUM(away_goals) AS goals_against
+                    FROM matches
+                    WHERE season = '2024/25'
+                    GROUP BY team_id),
+    games_away AS (SELECT away_team_id AS team_id,
+                            COUNT_IF(away_goals > home_goals) AS team_wins,
+                            COUNT_IF(home_goals = away_goals) AS team_draws,
+                            COUNT_IF(away_goals < home_goals) AS team_losses,
+                            SUM(away_goals) AS goals_for,
+                            SUM(home_goals) AS goals_against
+                    FROM matches
+                    WHERE season = '2024/25'
+                    GROUP BY team_id)
+SELECT t.team_name,
+    (gh.team_wins) AS home_wins,  
+    (gh.team_draws) AS home_draws,
+    (gh.team_losses) AS home_losses,
+    (gh.goals_for) AS home_goals_for,
+    (gh.goals_against) AS home_goals_against,
+    (gh.team_wins) * 3 + (gh.team_draws) AS home_points,
+    (ga.team_wins) AS away_wins,  
+    (ga.team_draws) AS away_draws,
+    (ga.team_losses) AS away_losses,
+    (ga.goals_for) AS away_goals_for,
+    (ga.goals_against) AS away_goals_against,
+    (ga.team_wins) * 3 + (ga.team_draws) AS away_points
+FROM club
+JOIN teams AS t ON club.team_id = t.team_id
+JOIN games_home AS gh ON t.team_id = gh.team_id
+JOIN games_away AS ga ON t.team_id = ga.team_id
+GROUP BY t.team_name, home_wins, home_draws, home_losses, home_points, home_goals_for, home_goals_against,
+away_wins, away_draws, away_losses, away_points, away_goals_for, away_goals_against;
+
+
+-----------------------------------------------------------------------------------------
+
