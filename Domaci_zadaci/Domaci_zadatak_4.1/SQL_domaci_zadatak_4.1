@@ -1,0 +1,75 @@
+-- 1. Koliko redova ima spoj matches i player_match_stats za sezonu 2024/25? Objasnite.
+
+SELECT COUNT(match_id) FROM player_match_stats WHERE match_id LIKE '2%';
+SELECT COUNT(match_id) FROM matches WHERE season = '2024/25';
+
+SELECT COUNT(*)
+FROM matches AS m
+JOIN player_match_stats AS pms ON m.match_id = pms.match_id AND m.season = '2024/25';
+
+-- U sezoni 2024/25 ima 380 meceva (matches).
+-- Za svaku utakmicu imamo podatke o 40 igraca, po 20 za oba tima.
+-- INNER JOIN nam daje presek ta dva, dakle 380 * 40 => 15200 redova
+
+
+
+-- 2. Koliko puta je igrač u istoj sezoni igrao za dva različita kluba?
+
+
+
+
+
+
+
+
+
+-- 3. Koliko utakmica ima više kartona od prosečne utakmice? Bez
+-- kartona računajte sa 0.
+
+
+
+
+
+
+-- 4. Koliko igrača je odigralo više od 10 utakmica u sezoni
+-- 2024/25?
+
+
+SELECT pms.player_id, COUNT_IF(pms.minutes_played > 0) AS matches_played 
+FROM player_match_stats AS pms
+INNER JOIN matches AS m ON m.match_id = pms.match_id AND m.season = '2024/25'
+GROUP BY pms.player_id
+HAVING matches_played > 10
+ORDER BY matches_played DESC;
+
+
+
+
+-- 5. Prikažite sve klubove koji su igrali u sezoni 2024/25, bilo kao
+-- domaćini ili kao gosti. Koristite UNION, a zatim izmenite upit
+-- tako da koristi UNION ALL. Objasnite razliku u broju redova koji
+-- dobijate.
+
+
+SELECT t.team_name 
+FROM teams AS t
+JOIN matches AS m ON m.home_team_id = t.team_id AND m.season = '2024/25'
+GROUP BY t.team_name
+UNION
+SELECT t.team_name 
+FROM teams AS t
+JOIN matches AS m ON m.away_team_id = t.team_id AND m.season = '2024/25'
+GROUP BY t.team_name;
+
+
+SELECT t.team_name 
+FROM teams AS t
+JOIN matches AS m ON m.home_team_id = t.team_id AND m.season = '2024/25'
+GROUP BY t.team_name
+UNION ALL
+SELECT t.team_name 
+FROM teams AS t
+JOIN matches AS m ON m.away_team_id = t.team_id AND m.season = '2024/25'
+GROUP BY t.team_name;
+
+--UNION izbacuje duplikate, dok UNION ALL spaja dve tabele bez ikakvih provera
