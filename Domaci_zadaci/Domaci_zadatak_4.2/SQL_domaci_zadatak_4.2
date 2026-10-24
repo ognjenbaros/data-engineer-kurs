@@ -98,3 +98,30 @@ away_wins, away_draws, away_losses, away_points, away_goals_for, away_goals_agai
 
 -----------------------------------------------------------------------------------------
 
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC')
+SELECT p.player_id,
+    CONCAT(p.first_name, ' ', p.last_name) AS player_name,
+    SUM(CASE WHEN event_type IN ('goal', 'penalty_goal') THEN 1 END) AS player_goals
+FROM match_events AS me
+JOIN players AS p ON p.player_id = me.player_id
+LEFT JOIN matches AS m ON m.match_id = me.match_id
+JOIN club AS c ON c.team_id = me.team_id
+WHERE m.season = '2024/25'
+GROUP BY p.player_id, player_name
+ORDER BY player_goals DESC
+LIMIT 3;
+
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC')
+SELECT p.player_id,
+       CONCAT(p.first_name, ' ', p.last_name) AS player_name,
+       SUM(CASE WHEN me.event_type IN ('goal') THEN 1 ELSE 0 END) AS total_assists
+FROM club AS c
+LEFT JOIN teams AS t ON t.team_id = c.team_id
+JOIN match_events AS me ON me.team_id = c.team_id AND me.event_type IN ('goal')
+JOIN matches AS m ON m.match_id = me.match_id AND m.season = '2024/25'
+JOIN players AS p ON p.player_id = me.related_player_id
+GROUP BY p.player_id, player_name
+ORDER BY total_assists DESC
+LIMIT 1;
+
+-----------------------------------------------------------------------------------------
