@@ -1,3 +1,6 @@
+ #1
+
+
 WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
     games_home AS (SELECT home_team_id AS team_id,
                             COUNT_IF(home_goals > away_goals) AS team_wins,
@@ -30,6 +33,7 @@ JOIN games_home AS gh ON t.team_id = gh.team_id
 JOIN games_away AS ga ON t.team_id = ga.team_id
 GROUP BY t.team_name, wins, draws, losses, points, total_goals_for, total_goals_against;
 
+
 WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
     games_home AS (SELECT home_team_id AS team_id,
                             COUNT_IF(home_goals > away_goals) AS team_wins,
@@ -55,6 +59,8 @@ GROUP BY t.team_name, wins, draws, losses, home_points, home_goals_for, home_goa
 
 
 ---------------------------------------------------------------------------------------
+#2
+
 
 WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
     games_home AS (SELECT home_team_id AS team_id,
@@ -97,6 +103,8 @@ away_wins, away_draws, away_losses, away_points, away_goals_for, away_goals_agai
 
 
 -----------------------------------------------------------------------------------------
+#3
+
 
 WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC')
 SELECT p.player_id,
@@ -110,6 +118,7 @@ WHERE m.season = '2024/25'
 GROUP BY p.player_id, player_name
 ORDER BY player_goals DESC
 LIMIT 3;
+
 
 WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC')
 SELECT p.player_id,
@@ -125,3 +134,121 @@ ORDER BY total_assists DESC
 LIMIT 1;
 
 -----------------------------------------------------------------------------------------
+
+#4
+
+
+
+
+----------------------------------------------------------------------------------------
+
+#5
+
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
+                games_home AS (SELECT home_team_id AS team_id,
+                            COUNT_IF(home_goals > away_goals) AS team_wins,
+                            COUNT_IF(home_goals = away_goals) AS team_draws,
+                            COUNT_IF(home_goals < away_goals) AS team_losses,
+                            SUM(home_goals) AS goals_for,
+                            SUM(away_goals) AS goals_against
+                    FROM matches
+                    WHERE season = '2024/25'
+                    GROUP BY team_id),
+    games_away AS (SELECT away_team_id AS team_id,
+                            COUNT_IF(away_goals > home_goals) AS team_wins,
+                            COUNT_IF(home_goals = away_goals) AS team_draws,
+                            COUNT_IF(away_goals < home_goals) AS team_losses,
+                            SUM(away_goals) AS goals_for,
+                            SUM(home_goals) AS goals_against
+                    FROM matches
+                    WHERE season = '2024/25'
+                    GROUP BY team_id)
+SELECT ms.manager_name, 
+    ( gh.team_wins + ga.team_wins ) * 3 + ( gh.team_draws + ga.team_draws ) AS points
+FROM manager_spells AS ms
+JOIN club AS c ON ms.team_id = c.team_id
+JOIN games_away AS ga ON ga.team_id = c.team_id
+JOIN games_home AS gh ON gh.team_id = c.team_id;
+
+
+----------------------------------------------------------------------------------------
+
+#6
+
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
+                games_home AS (SELECT home_team_id AS team_id,
+                            COUNT_IF(home_goals > away_goals) AS team_wins,
+                            COUNT_IF(home_goals = away_goals) AS team_draws,
+                            COUNT_IF(home_goals < away_goals) AS team_losses,
+                            SUM(home_goals) AS goals_for,
+                            SUM(away_goals) AS goals_against
+                    FROM matches
+                    WHERE season = '2024/25'
+                    GROUP BY team_id),
+    games_away AS (SELECT away_team_id AS team_id,
+                            COUNT_IF(away_goals > home_goals) AS team_wins,
+                            COUNT_IF(home_goals = away_goals) AS team_draws,
+                            COUNT_IF(away_goals < home_goals) AS team_losses,
+                            SUM(away_goals) AS goals_for,
+                            SUM(home_goals) AS goals_against
+                    FROM matches
+                    WHERE season = '2024/25'
+                    GROUP BY team_id)
+SELECT ms.manager_name, 
+    ( gh.team_wins + ga.team_wins ) * 3 + ( gh.team_draws + ga.team_draws ) AS points
+FROM manager_spells AS ms
+JOIN club AS c ON ms.team_id = c.team_id
+JOIN games_away AS ga ON ga.team_id = c.team_id
+JOIN games_home AS gh ON gh.team_id = c.team_id;
+
+
+
+------------------------------------------------------------------------------------------
+
+-- 6. Највећа победа и најтежи пораз.
+
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
+
+        difference AS (SELECT  match_id, home_goals - away_goals AS goal_diff
+                    FROM matches AS m
+                    JOIN club AS c ON c.team_id = m.home_team_id AND season = '2024/25'
+                    UNION
+                    SELECT  match_id, away_goals - home_goals AS goal_diff
+                    FROM matches AS m
+                    JOIN club AS c ON c.team_id = m.away_team_id AND season = '2024/25'
+                    ),
+     max_min_diff AS ((SELECT match_id
+                       FROM difference
+                       ORDER BY goal_diff DESC
+                       LIMIT 1)
+                       UNION
+                       (SELECT match_id
+                       FROM difference
+                       ORDER BY goal_diff
+                       LIMIT 1)
+                    )
+SELECT mmd.match_id, CONCAT(ht.team_name, ' ', m.home_goals,':', m.away_goals,' ', awt.team_name) AS game
+FROM max_min_diff AS mmd
+JOIN matches AS m ON m.match_id = mmd.match_id
+JOIN teams AS ht ON ht.team_id = m.home_team_id
+JOIN teams AS awt ON awt.team_id = m.away_team_id;
+
+
+------------------------------------------------------------------------------------
+
+#7
+
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC')
+SELECT s.stadium_name,
+        ROUND(AVG(m.attendance), 2) AS avg_att_home,
+        ROUND(100 * AVG(m.attendance/s.capacity), 2) AS avg_fill_percentage_home,
+        SUM(CASE WHEN m.attendance IS NULL THEN 1 ELSE 0 END) AS att_no_info
+FROM teams AS t
+RIGHT JOIN club AS c ON c.team_id = t.team_id
+JOIN stadiums AS s ON t.stadium_id = s.stadium_id
+JOIN matches AS m ON m.home_team_id = c.team_id AND m.season = '2024/25'
+GROUP BY s.stadium_name;
+
+
+------------------------------------------------------------------------------------
+
