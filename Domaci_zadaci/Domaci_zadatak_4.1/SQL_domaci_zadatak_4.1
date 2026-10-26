@@ -19,9 +19,18 @@ JOIN player_match_stats AS pms ON m.match_id = pms.match_id AND m.season = '2024
 -- 2. Koliko puta je igrač u istoj sezoni igrao za dva različita kluba?
 
 
-
-
-
+SELECT
+    m.season,
+    pms.player_id,
+    CONCAT(p.first_name, ' ', p.last_name) AS player_name,
+    COUNT(DISTINCT pms.team_id) AS teams_played_for
+FROM player_match_stats pms
+JOIN players AS p ON p.player_id = pms.player_id
+JOIN matches m ON m.match_id = pms.match_id
+WHERE pms.minutes_played > 0
+GROUP BY pms.player_id, player_name, m.season
+HAVING COUNT(DISTINCT pms.team_id) > 1
+ORDER BY m.season, teams_played_for DESC, pms.player_id;
 
 
 
