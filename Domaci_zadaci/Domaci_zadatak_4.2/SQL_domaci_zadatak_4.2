@@ -137,7 +137,46 @@ LIMIT 1;
 
 #4
 
+WITH        club AS (SELECT team_id FROM teams WHERE team_name = 'Queensport FC'),
+        team_cards AS (SELECT team_id,
+                        SUM(CASE WHEN event_type IN ('yellow_card', 'second_yellow', 'red_card') THEN 1 ELSE 0 END) as team_cards
+                        FROM match_events
+                        WHERE match_id >= 2000
+                        GROUP BY team_id
+                        ORDER BY team_id),
 
+       home_team_matches AS (SELECT home_team_id AS team_id,
+                        COUNT(*) AS home_matches
+                        FROM matches
+                        WHERE match_id >= 2000 AND status = 'played'
+                        GROUP BY home_team_id),
+                      
+          away_team_matches AS (SELECT away_team_id AS team_id,
+                        COUNT(*) AS away_matches
+                        FROM matches
+                        WHERE match_id >= 2000 AND status = 'played'
+                        GROUP BY away_team_id),
+
+        per_team_matches AS (SELECT htm.team_id AS team_id,
+                        htm.home_matches + atm.away_matches AS team_matches
+                        FROM home_team_matches AS htm
+                        JOIN away_team_matches AS atm ON htm.team_id = atm.team_id
+                        ORDER BY htm.team_id),
+
+       avg_cards_total AS (SELECT 
+                            ROUND(SUM(tc.team_cards)/(SUM(ptm.team_matches)/2),2) AS avg_cards_per_team_per_match
+                            FROM team_cards AS tc
+                            JOIN per_team_matches AS ptm ON ptm.team_id = tc.team_id)
+
+SELECT t.team_name, t.team_id,
+         ROUND(tc.team_cards / ptm.team_matches, 2) AS team_avg_cards,
+         act.avg_cards_per_team_per_match
+FROM teams AS t
+JOIN team_cards AS tc ON t.team_id = tc.team_id
+JOIN club AS c ON t.team_id = c.team_id
+JOIN per_team_matches AS ptm ON ptm.team_id = t.team_id
+CROSS JOIN avg_cards_total AS act
+ORDER BY t.team_id;
 
 
 ----------------------------------------------------------------------------------------
