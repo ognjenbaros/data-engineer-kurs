@@ -1,0 +1,42 @@
+-- 1. Za sezonu 2024/25 prikažite igrače i ukupan broj golova
+-- koje su postigli. Prikažite samo igrače koji su postigli bar
+-- jedan gol.
+
+
+SELECT p.player_id, CONCAT(P.first_name, ' ', p.last_name) AS player_name,
+       SUM(CASE WHEN me.event_type IN ('goal','penalty_goal') THEN 1 ELSE 0 END) AS player_goals,
+       DENSE_RANK() OVER (ORDER BY SUM(CASE WHEN me.event_type IN ('goal','penalty_goal') THEN 1 ELSE 0 END) DESC) AS dens_rnk
+FROM players AS p
+JOIN match_events AS me ON p.player_id = me.player_id AND me.match_id >= 2000
+GROUP BY p.player_id, player_name
+HAVING player_goals > 0
+ORDER BY player_goals DESC;
+
+
+
+-- 2. Za sezonu 2024/25 prikažite tri igrača sa najviše
+-- postignutih golova za svaki klub.
+
+WITH goals_per_player (SELECT me.team_id, p.player_id, CONCAT(P.first_name, ' ', p.last_name) AS player_name,
+                     SUM(CASE WHEN me.event_type IN ('goal','penalty_goal') THEN 1 ELSE 0 END) AS player_goals,
+                     ROW_NUMBER() OVER (PARTITION BY me.team_id ORDER BY SUM(CASE WHEN me.event_type IN ('goal','penalty_goal') THEN 1 ELSE 0 END) DESC) AS row_no
+                     FROM players AS p
+                     JOIN match_events AS me ON p.player_id = me.player_id AND me.match_id >= 2000
+                     GROUP BY me.team_id, p.player_id, player_name
+                     HAVING player_goals > 0
+                     QUALIFY row_no <= 3
+                     ORDER BY player_goals DESC
+                     )
+SELECT t.team_name, 
+       gpp.player_id, gpp.player_name,
+       gpp.player_goals,
+       gpp.row_no
+FROM goals_per_player AS gpp
+JOIN teams AS t ON t.team_id = gpp.team_id;
+
+
+
+
+-- 3. Za sezonu 2024/25 prikažite sve utakmice svakog kluba,
+-- broj golova koje je klub postigao i broj golova koje je postigao
+-- u svojoj prethodnoj utakmici.
