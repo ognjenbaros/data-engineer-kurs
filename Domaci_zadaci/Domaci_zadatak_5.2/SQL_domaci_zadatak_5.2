@@ -1,0 +1,65 @@
+-- 1. Prosek datih golova u poslednjih 5 utakmica, uz izričit
+-- okvir prozora. Koja je najveća vrednost? Računajte
+-- samo kada prozor zaista ima 5 utakmica.
+
+SELECT * FROM team_matches ORDER BY team_id, kickoff_ts LIMIT 100;
+
+SELECT t.team_name,
+        ROUND(AVG(tm.goals_for) OVER (PARTITION BY tm.team_id ORDER BY tm.match_id 
+                                                        ROWS BETWEEN 4 PRECEDING AND CURRENT ROW), 2) AS avg_last_5
+FROM team_matches AS tm
+JOIN teams AS t ON t.team_id = tm.team_id
+ORDER BY avg_last_5 DESC;
+
+
+--************** nije gotov zadatak, potrebno je ispuniti poslednju uslov ************-------------
+
+
+-- 2. Tekući zbir datih golova svakog kluba u sezoni
+-- 2024/25: ko je prvi stigao do 50 golova i kada?
+
+WITH goals_so_far AS (
+    SELECT  tm.kickoff_ts,
+            t.team_name, 
+            SUM(tm.goals_for) OVER (PARTITION BY tm.team_id ORDER BY tm.match_id
+                                            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS goals_so_far
+    FROM team_matches AS tm
+    JOIN teams AS t ON t.team_id = tm.team_id
+    WHERE tm.match_id >= 2000
+    ORDER BY tm.kickoff_ts
+                    )
+SELECT kickoff_ts, team_name, goals_so_far
+FROM goals_so_far
+WHERE goals_so_far >= 50;
+
+--Prvi tim koji je postigao 50 golova u sezoni 2024/25 je Kingsbridge City na utakmici odigranoj 18. januara 2025.
+
+
+
+-- 3. Za svaku domaću utakmicu izračunajte promenu
+-- posećenosti u odnosu na prethodnu domaću utakmicu
+-- istog kluba u istoj sezoni. Gde je najveći pad i zašto?
+
+
+SELECT  m.kickoff_ts, m.season,
+        tm.team_id, 
+        s.stadium_name, coalesce(m.attendance, 0) AS attend,
+        LAG(coalesce(m.attendance, 0), 1, 0) OVER (PARTITION BY tm.team_id ORDER BY m.kickoff_ts) AS att_last_match,
+        attend - att_last_match AS att_diff
+FROM team_matches AS tm
+JOIN matches AS m ON m.match_id = tm.match_id AND m.season = '2024/25'
+JOIN stadiums AS s ON s.stadium_id = m.stadium_id
+WHERE tm.venue = 'home'
+UNION ALL
+SELECT  m.kickoff_ts, m.season,
+        tm.team_id, 
+        s.stadium_name, m.attendance,
+        LAG(coalesce(m.attendance, 0), 1, 0) OVER (PARTITION BY tm.team_id ORDER BY m.kickoff_ts) AS att_last_match,
+        coalesce(m.attendance, 0) - att_last_match AS att_diff
+FROM team_matches AS tm
+JOIN matches AS m ON m.match_id = tm.match_id AND m.season = '2023/24'
+JOIN stadiums AS s ON s.stadium_id = m.stadium_id
+WHERE tm.venue = 'home'
+ORDER BY att_diff;
+
+--Najveci "pad" je na prvim utakmicama u sezoni i kada nema podataka za posecenost na prethodnoj utakmici
