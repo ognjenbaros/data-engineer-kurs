@@ -40,3 +40,15 @@ JOIN teams AS t ON t.team_id = gpp.team_id;
 -- 3. Za sezonu 2024/25 prikažite sve utakmice svakog kluba,
 -- broj golova koje je klub postigao i broj golova koje je postigao
 -- u svojoj prethodnoj utakmici.
+
+
+SELECT tm.team_id, t.team_name,
+       tm.match_id,
+       tm.goals_for AS goals_scored,
+       LAG(tm.goals_for, 1, 0) OVER (PARTITION BY tm.team_id ORDER BY tm.match_id) AS previous_game_goals,
+       goals_scored - previous_game_goals AS goal_diff
+FROM team_matches AS tm
+JOIN teams AS t ON t.team_id = tm.team_id
+JOIN matches AS m ON tm.match_id = m.match_id AND m.season = '2024/25'
+ORDER BY tm.team_id, m.kickoff_ts;
+
