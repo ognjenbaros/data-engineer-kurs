@@ -9,10 +9,14 @@ SELECT t.team_name,
                                                         ROWS BETWEEN 4 PRECEDING AND CURRENT ROW), 2) AS avg_last_5
 FROM team_matches AS tm
 JOIN teams AS t ON t.team_id = tm.team_id
+QUALIFY (COUNT(match_id) OVER (PARTITION BY tm.team_id ORDER BY tm.match_id ROWS BETWEEN 4 PRECEDING AND CURRENT ROW)< 5)
 ORDER BY avg_last_5 DESC;
 
 
---************** nije gotov zadatak, potrebno je ispuniti poslednju uslov ************-------------
+-- Prvo mesto dele Castlebrook United, Elmsworth Wanderers, Lakeside Rangers sa prosekom
+-- od 4 postignuta gola po utakmici u poslednje cetiri utakmice
+
+
 
 
 -- 2. Tekući zbir datih golova svakog kluba u sezoni
@@ -23,7 +27,7 @@ WITH goals_so_far AS (
             t.team_name, 
             SUM(tm.goals_for) OVER (PARTITION BY tm.team_id ORDER BY tm.match_id
                                             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS goals_so_far
-    FROM team_matches AS tm
+-    FROM team_matches AS tm
     JOIN teams AS t ON t.team_id = tm.team_id
     WHERE tm.match_id >= 2000
     ORDER BY tm.kickoff_ts
@@ -32,7 +36,9 @@ SELECT kickoff_ts, team_name, goals_so_far
 FROM goals_so_far
 WHERE goals_so_far >= 50;
 
---Prvi tim koji je postigao 50 golova u sezoni 2024/25 je Kingsbridge City na utakmici odigranoj 18. januara 2025.
+-- Prvi tim koji je postigao 50 golova u sezoni 2024/25 je Kingsbridge City
+-- na utakmici odigranoj 18. januara 2025.
+
 
 
 
@@ -62,4 +68,5 @@ JOIN stadiums AS s ON s.stadium_id = m.stadium_id
 WHERE tm.venue = 'home'
 ORDER BY att_diff;
 
---Najveci "pad" je na prvim utakmicama u sezoni i kada nema podataka za posecenost na prethodnoj utakmici
+-- Najveci "pad" je na prvim utakmicama u sezoni 
+-- i kada nema podataka za posecenost na prethodnoj utakmici
