@@ -1,0 +1,90 @@
+
+-- 1. Kreiranje dimenzije igrača
+-- Na osnovu tabele players napravite tabelu dim_player koja
+-- sadrži sledeće kolone: player_id, ime, prezime, poziciju i 
+-- nacionalnost igrača.
+-- Koliko redova ima novokreirana tabela?
+
+CREATE OR REPLACE TABLE dim_player AS
+SELECT  player_id, 
+        first_name, last_name,
+        position, nationality
+FROM bootcamp.default.players;
+
+SELECT COUNT(*) FROM dim_player;    --681, isto kao u tabeli players
+
+
+
+
+-- 2. Kreiranje dimenzije datuma i činjenične tabele
+-- Napravite tabelu dim_date na isti način kao na predavanju.
+
+-- Zatim napravite tabelu fact_player_match na osnovu tabela 
+-- player_match_stats i matches. Tabela treba da sadrži sledeće kolone:
+-- match_id, date_key, player_id, team_id, minutes_played, shots, passes i rating.
+
+-- U tabelu uključite samo podatke koji se odnose na odigrane
+-- utakmice.
+-- Kolika je granularnost tabele fact_player_match, odnosno
+-- šta predstavlja jedan njen red?
+-- Koliko redova ima ova tabela?
+
+
+
+CREATE OR REPLACE TABLE dim_date AS
+SELECT CAST(DATE_FORMAT (date, 'yyyyMMdd') AS INT) AS date_key,
+            date                                   AS full_date,
+            DATE_FORMAT(date, 'EEEE')              AS weekday_name,
+            DAYOFWEEK(date) IN (1,7)              AS is_weekend,
+            CASE WHEN MONTH(date) >= 7 THEN CONCAT(YEAR(date), '/', SUBSTRING(CAST(YEAR(date) + 1 AS STRING), 3, 2))
+                 ELSE CONCAT(YEAR(date) - 1, '/', SUBSTRING(CAST(YEAR(date) AS STRING), 3, 2))
+            END                                    AS season
+FROM (SELECT EXPLODE(SEQUENCE(DATE'2023-07-01', DATE'2025-06-30', INTERVAL 1 DAY)) AS date);
+
+
+CREATE OR REPLACE TABLE fact_player_match AS 
+SELECT  m.match_id,
+        d.date_key AS date_key,
+        pms.player_id, pms.team_id,
+        pms.minutes_played, pms.shots, pms.passes, pms.rating
+FROM bootcamp.default.player_match_stats AS pms
+JOIN bootcamp.default.matches AS m ON m.match_id = pms.match_id AND m.status = 'played'
+JOIN dim_date AS d ON d.full_date = DATE(m.kickoff_ts);
+
+SELECT * FROM dim_date;
+
+-- Jedan red mi predstavlja podatke o jednom igracu na jednoj utakmici
+-- Imamo 30400 redova u tabeli fact_player_match
+
+SELECT * FROM bootcamp.default.player_match_stats;  --30 440
+SELECT * FROM fact_player_match;                    --30 400
+
+-- Razlika je u 40 redova o igracima za prekinutu utakmicu,
+-- po 20 igraca u oba tima koji su bili u sastavu za tu utakmicu.
+
+SELECT * FROM bootcamp.default.player_match_stats AS pms
+JOIN bootcamp.default.matches AS m ON m.match_id = pms.match_id
+WHERE m.status <> 'played';
+
+
+
+
+-- 3. Prosečna ocena igrača po poziciji
+-- Koristeći napravljene dimenzije i činjeničnu tabelu, izračunajte
+-- prosečnu ocenu (rating) igrača za svaku poziciju tokom
+-- sezone 2024/25.
+-- Prikažite poziciju i odgovarajuću prosečnu ocenu.
+
+
+SELECT  dp.position,
+        ROUND(AVG(CASE WHEN fpm.rating <> 'nan' THEN fpm.rating
+                 WHEN fpm.rating = 'nan' THEN NULL END), 2) AS avg_rating
+FROM fact_player_match AS fpm
+JOIN dim_player AS dp ON dp.player_id = fpm.player_id
+WHERE fpm.match_id >=1000 AND fpm.match_id <=1999
+GROUP BY dp.position
+ORDER BY avg_rating DESC;
+
+-- U sezoni 2024/25 najvisu prosecnu ocenu su imali napadaci(FW) sa 6.8,
+-- dok su iza njih "srednjaci"(MF) sa 6.71. Golmani(GK) sa 6.65 i
+-- odbrambeni igraci(DF) sa 6.63 su, ocekivano, na zacelju.
