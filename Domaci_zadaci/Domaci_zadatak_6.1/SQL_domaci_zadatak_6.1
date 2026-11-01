@@ -88,3 +88,30 @@ ORDER BY avg_rating DESC;
 -- U sezoni 2024/25 najvisu prosecnu ocenu su imali napadaci(FW) sa 6.8,
 -- dok su iza njih "srednjaci"(MF) sa 6.71. Golmani(GK) sa 6.65 i
 -- odbrambeni igraci(DF) sa 6.63 su, ocekivano, na zacelju.
+
+
+
+-- 4. Dodavanje broja golova u činjeničnu tabelu
+
+-- Proširite tabelu fact_player_match dodavanjem kolone koja
+-- predstavlja broj golova koje je svaki igrač postigao na
+-- određenoj utakmici.
+-- Koliki je ukupan zbir golova svih igrača u tabeli
+-- fact_player_match?
+
+ALTER TABLE fact_player_match ADD COLUMN (goals_scored INT);
+
+
+WITH goals AS (
+            SELECT   match_id, player_id,
+                     SUM(CASE WHEN event_type IN ('goal', 'own_goal', 'penalty_goal') THEN 1 ELSE 0 END) AS scored
+FROM bootcamp.default.match_events
+GROUP BY match_id, player_id
+                )
+MERGE INTO fact_player_match AS fpm
+USING goals AS g ON g.match_id = fpm.match_id AND g.player_id = fpm.player_id
+WHEN MATCHED THEN
+UPDATE SET fpm.goals_scored = g.scored;
+
+-- Mora da sam ja nešto propustio na času, jer ovo pitanje mi je u zbiru oduzelo 8 sati u tri dana
+-- i uopšte nisam zadovoljan kako izgleda, ali barem pomalo liči na traženo rešenje
