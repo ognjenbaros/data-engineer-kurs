@@ -7,9 +7,9 @@
 
 
 def c_to_f(temperature):
-    return temperature * 1.8 +32
+    print(f'Temperature is {temperature * 1.8 +32} degrees Fahrenheit')
 
-print(c_to_f(30))
+c_to_f(30)
 
 
 
