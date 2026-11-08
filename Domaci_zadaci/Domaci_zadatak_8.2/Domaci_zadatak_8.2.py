@@ -88,7 +88,8 @@ print(write_rows(test_path, test_rows))
 #                          Ana,20
 #                          Marko,22
 
-
+# Napomena: svesno sam koristio append,
+# tako da imam više upisa u taj .csv fajl 
 
 
 
@@ -125,5 +126,3 @@ write_dicts(test_path, test_rows)
 #                         Marko,22
 
 
-# Napomena: svesno sam u zadatku sa new_file.csv stavio append,
-# tako da imam više upisa u taj .csv fajl 
