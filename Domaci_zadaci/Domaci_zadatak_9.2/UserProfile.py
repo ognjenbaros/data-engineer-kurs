@@ -42,3 +42,14 @@ class UserProfile:
 
     def display_info(self):
         print(f'Username: {self.username}, email: {self.email}, City: {self.city}, Profile active: {self.active}')
+
+
+
+user = UserProfile("ana123","ana@gmail.com","Nis")
+user.display_info()
+user.change_email("ana@yahoo.com").change_city("Beograd").deactivate()
+user.display_info()
+
+
+# Output:   Username: ana123, email: ana@gmail.com, City: Nis, Profile active: True
+#           Username: ana123, email: ana@yahoo.com, City: Beograd, Profile active: False

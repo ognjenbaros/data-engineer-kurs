@@ -37,3 +37,14 @@ class BankAccount:
 
     def __repr__(self):
         return f'Bank Account \nOwner: {self.owner} \nBalance: {self.balance}'
+
+
+
+account = BankAccount("Ana", 10000)
+account.deposit(5000).withdraw(2000).deposit(1000)
+account.display_balance()
+print(account)
+
+# Output: Bank Account 
+#         Owner: Ana 
+#         Balance: 14000

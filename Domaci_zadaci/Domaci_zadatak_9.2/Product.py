@@ -42,3 +42,11 @@ class Product:
 
     def display_info(self):
         print(f'Product name: {self.name}, Quantity: {self.quantity}, Price: {self.price}')
+
+
+
+product = Product("Laptop", 80000, 10)
+product.change_price(75000).sell(2).add_stock(6).sell(3)
+product.display_info()
+
+# Output:   Product name: Laptop, Quantity: 11, Price: 75000
