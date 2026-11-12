@@ -80,7 +80,7 @@ def count_products(csv_lines):
         product_name = line.split(',')[1]
         product_quantity = line.split(',')[2]
         if product_name in product_orders:
-            product_orders[product_name] = str(int(product_orders[product_name]) + int(product_quantity))
+            product_orders[product_name] = int(product_orders[product_name]) + int(product_quantity)
         else:
             product = [(product_name, product_quantity)]
             product_orders.update(product)

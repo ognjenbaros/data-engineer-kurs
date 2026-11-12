@@ -110,12 +110,12 @@ test_rows = [{'name': 'Ana', 'age': 20}, {'name':'Marko', 'age': 22}]
 def write_dicts(path, rows):
     with open(path, 'w') as f:
         header = []
-        for row in test_rows[:1]:
+        for row in rows[:1]:
             for info in row:
                 header.append(info)
         writer = csv.DictWriter(f, fieldnames = header)
         writer.writeheader()
-        writer.writerows(test_rows)
+        writer.writerows(rows)
     
 
 write_dicts(test_path, test_rows)
